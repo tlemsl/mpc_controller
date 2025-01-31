@@ -1,0 +1,3 @@
+[submodule "3rdparty/MPC"]
+	path = 3rdparty/MPC
+	url = git@github.com:tlemsl/MPC.git
