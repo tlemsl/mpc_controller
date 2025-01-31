@@ -45,13 +45,13 @@ MPCController::MPCController(ros::NodeHandle& nh) : nh_(nh) {
   //     std::make_unique<MJMPC::Control::iLQR>(dynamics_discrete, Q, R, Qf, N);
   controller_->setState(Eigen::VectorXd::Zero(3));
   controller_->setReference(Eigen::VectorXd::Zero(3));
-  sub_state_ = nh_.subscribe("/mushr_mujoco_ros/buddy/pose", 1,
+  sub_state_ = nh_.subscribe("/mcl_pose", 1,
                              &MPCController::stateCallback, this);
   sub_reference_ = nh_.subscribe("/move_base_simple/goal", 1,
                                  &MPCController::referenceCallback, this);
   pub_control_ = nh_.advertise<ackermann_msgs::AckermannDriveStamped>(
-      "/mushr_mujoco_ros/buddy/control", 1);
-  pub_path_ = nh.advertise<nav_msgs::Path>("/predicted_trajectory", 1);
+      "/base_board/cmd", 1);
+  pub_path_ = nh_.advertise<nav_msgs::Path>("/predicted_trajectory", 1);
 
   running_ = true;
   control_thread_ = std::thread(&MPCController::controlThread, this);
@@ -62,11 +62,11 @@ MPCController::~MPCController() {
   control_thread_.join();
 }
 
-void MPCController::stateCallback(const geometry_msgs::PoseStamped& msg) {
-  double x = msg.pose.position.x;
-  double y = msg.pose.position.y;
+void MPCController::stateCallback(const geometry_msgs::PoseWithCovarianceStamped& msg) {
+  double x = msg.pose.pose.position.x;
+  double y = msg.pose.pose.position.y;
   tf2::Quaternion q;
-  tf2::fromMsg(msg.pose.orientation, q);
+  tf2::fromMsg(msg.pose.pose.orientation, q);
   double roll, pitch, yaw;
   tf2::Matrix3x3(q).getRPY(roll, pitch, yaw);
   state_ << x, y, yaw;

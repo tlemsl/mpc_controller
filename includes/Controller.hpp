@@ -3,6 +3,7 @@
 
 #include <ackermann_msgs/AckermannDriveStamped.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <nav_msgs/Path.h>
 #include <ros/ros.h>
 
@@ -37,7 +38,7 @@ class MPCController {
   std::thread control_thread_;
   bool running_;
 
-  void stateCallback(const geometry_msgs::PoseStamped& msg);
+  void stateCallback(const geometry_msgs::PoseWithCovarianceStamped& msg);
   void referenceCallback(const geometry_msgs::PoseStamped& msg);
 };
 
